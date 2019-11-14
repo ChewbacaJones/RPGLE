@@ -1,0 +1,79 @@
+            PGM
+
+             DCL        VAR(&FRMLIB)     TYPE(*char) len(10)
+             DCL        VAR(&bankNo)     TYPE(*char) len(3)
+             DCL        VAR(&iBankNo)    TYPE(*DEC) len(3)
+             DCL        VAR(&lnTran)     TYPE(*CHAR) LEN(1)
+             DCL        VAR(&ddTran)     TYPE(*CHAR) LEN(1)
+             DCL        VAR(&cdTran)     TYPE(*CHAR) LEN(1)
+             DCL        VAR(&lnInsert)   TYPE(*CHAR) LEN(1)
+             DCL        VAR(&ddInsert)   TYPE(*CHAR) LEN(1)
+             DCL        VAR(&cdInsert)   TYPE(*CHAR) LEN(1)
+             DCL        VAR(&lnCheck)    TYPE(*CHAR) LEN(1)
+             DCL        VAR(&cdCheck)    TYPE(*CHAR) LEN(1)
+             DCL        VAR(&AREAP)      TYPE(*CHAR) LEN(1024)
+             DCL        VAR(&DATLIB)     TYPE(*CHAR) LEN(10)
+             DCL        VAR(&RETRO)      TYPE(*CHAR) LEN(10)
+             DCL        VAR(&REL)        TYPE(*CHAR) LEN(1)
+
+             DCLF       FILE(NBSETUPFM) RCDFMT(*ALL)
+
+             CHGVAR     VAR(&lnTran)     VALUE('Y')
+             CHGVAR     VAR(&ddTran)     VALUE('Y')
+             CHGVAR     VAR(&cdTran)     VALUE('Y')
+             CHGVAR     VAR(&lnInsert)   VALUE('Y')
+             CHGVAR     VAR(&ddInsert)   VALUE('Y')
+             CHGVAR     VAR(&cdInsert)   VALUE('Y')
+             CHGVAR     VAR(&lnCheck)    VALUE('Y')
+             CHGVAR     VAR(&cdCheck)    VALUE('Y')
+
+             RTVDTAARA  DTAARA(JHAPAR)  RTNVAR(&AREAP)
+
+
+             CHGDTAARA  DTAARA(*LDA) VALUE(&AREAP)
+             CHGVAR     VAR(&REL)       VALUE(%SST(&AREAP 489 1))
+             CHGVAR     VAR(&RETRO)     VALUE('R' *CAT &REL *CAT 'SLRETRO')
+
+AGAIN:      SNDRCVF    RCDFMT(PROMPT)
+
+             IF         COND(&IN03 *EQ '1') THEN(RETURN)
+
+             IF         COND(&IN01 *EQ '1') THEN(DO)
+/*           CALL       PGM(QUSCMDLN)                           */
+             GOTO       AGAIN
+             ENDDO
+
+             CHKOBJ     OBJ(&FRMLIB) OBJTYPE(*LIB)
+             MONMSG     MSGID(CPF9810 CPF9801 CPF0001) EXEC(CHGVAR +
+                          VAR(&IN41) VALUE('1'))
+
+/*                  Object Not Found                             */
+             IF         COND(&IN41 *EQ '1') THEN(DO)
+             GOTO       AGAIN
+             ENDDO
+
+             CHGVAR     VAR(&iBankNo)  VALUE(%DEC(&bankNo 3 0))
+
+
+ /*   Create Temp Lib to store the standard files to be pulled from */
+             CHKOBJ     OBJ(JHANBSETUP) OBJTYPE(*LIB)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+             CRTLIB     LIB(JHANBSETUP) TEXT('New Bank Prep Lib') AUT(*ALL)
+             CHGOBJOWN  OBJ(JHANBSETUP) OBJTYPE(*LIB) NEWOWN(JHAGROUP)
+             ENDDO
+
+             RSTOBJ     OBJ(*ALL) SAVLIB(JHANBSETUP) DEV(*SAVF) +
+                          OBJTYPE(*FILE) SAVF(&FRMLIB/NBSETUPSAV) MBROPT(*ALL)
+
+             CALL       PGM(NBSETUP) PARM(&frmLib &bankNo &lnTran &ddTran  +
+                        &cdTran &lnInsert &ddInsert &cdInsert &lnCheck  +
+                        &cdCheck &retro)
+
+
+
+
+ /*   Cleanup     */
+             DLTLIB     LIB(JHANBSETUP)
+             MONMSG     MSGID(CPF0000)
+
+             ENDPGM                   

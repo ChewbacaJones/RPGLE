@@ -1,10 +1,10 @@
      FCFSRCHFM  Cf   e             workstn
-     Fecdmast   if   e           k disk    prefix(ec_) rename(rcdmast:recdmast)
-     Fcdmast    if   e           k disk    prefix(c_)
-     Felnmast   if   e           k disk    prefix(el_) rename(rlnmast:relnmast)
-     Flnmast    if   e           k disk    prefix(l_)
-     Feddmast   if   e           k disk    prefix(ed_) rename(rddmast:reddmast)
-     Fddmast    if   e           k disk    prefix(d_)
+     Fxtimain   if   e           k disk    prefix(ec_) rename(rtimain:rxtimain)
+     Ftimain    if   e           k disk    prefix(c_)
+     Fxlnmain   if   e           k disk    prefix(el_) rename(rlnmain:rxlnmain)
+     Flnmain    if   e           k disk    prefix(l_)
+     Fxdemain   if   e           k disk    prefix(ed_) rename(rdemain:rxdemain)
+     Fdemain    if   e           k disk    prefix(d_)
      Foldnew    if   e           k disk
      Fcfoldnew  if   e           k disk
 
@@ -319,43 +319,43 @@
          end-pi;
 
          select;
-         when fName = 'cdmast';
-           chain (acct) recdmast;
-           if %found(ecdmast);
+         when fName = 'timain';
+           chain (acct) rxtimain;
+           if %found(xtimain);
              oldcf = ec_cifno;
              srchCif = ec_cifno;
            else;
              //not found
            endif;
-         when fName = 'lnmast';
-           chain (acct) relnmast;
+         when fName = 'lnmain';
+           chain (acct) rxlnmain;
            if %found(elnmast);
              oldcf = el_cifno;
              srchCif = el_cifno;
            else;
              //not found
            endif;
-         when fName = 'ddmast';
-           chain (acct) reddmast;
-           if %found(eddmast);
+         when fName = 'demain';
+           chain (acct) rxdemain;
+           if %found(xdemain);
              oldcf = ed_cifno;
              srchCif = ed_cifno;
            else;
              //not found
            endif;
          when fName = '*ALL';
-           chain (acct) recdmast;
-           If %found(ecdmast);
+           chain (acct) rxtimain;
+           If %found(xtimain);
              oldcf = ec_cifno;
              srchCif = ec_cifno;
            Else;
-             chain (acct) relnmast;
-             if %found(elnmast);
+             chain (acct) rxlnmain;
+             if %found(xlnmain);
                oldcf = el_cifno;
                srchCif = el_cifno;
              else;
-               chain (acct) reddmast;
-               if %found(eddmast);
+               chain (acct) rxdemain;
+               if %found(xdemain);
                  oldcf = ed_cifno;
                  srchCif = ed_cifno;
                else;
@@ -378,8 +378,8 @@
          end-pi;
 
          Select;
-         When fName = 'cdmast';
-           chain (acct) rcdmast;
+         When fName = 'timain';
+           chain (acct) rtimain;
            if %found(cdmast);
              newcf = c_cifno;
              srchCif = c_cifno;

@@ -1,0 +1,34 @@
+      A*%%TS  SD  20190430  080855  JONGRANTHA  REL-V7R3M0  5770-WDS                
+      A*%%EC                                                                        
+      A                                      INDARA                                 
+      A                                      DSPSIZ(24 80 *DS3)                     
+      A*                                     DSPSIZ(27 132 *DS4)                    
+      A                                      REF(*LIBL/PDFREF)                      
+      A                                      PRINT(*LIBL/QSYSPRT)                   
+      A                                      CF03(03 'F3=EXIT')                     
+      A                                      CF01(01 'HELP')                        
+      A          R PROMPT                                                           
+      A                                  1  4TIME                                   
+      A                                  1 70DATE                                   
+      A                                      EDTCDE(Y)                              
+      A                                  8 18'BANK NO: '                            
+      A            BANKNO         3A  B  8 30                                       
+      A                                  8 40'LIBRARY: '                            
+      A            FRMLIB        10A  B    +2                                       
+      A                                 11  5'LOAD LN TRAN CODES '                  
+      A            LNTRAN         1A  B    +1                                       
+      A                                    +4'LOAD DD TRAN CODES '                
+      A            DDTRAN         1A  B    +1                                     
+      A                                    +4'LOAD CD TRAN CODES '                
+      A            CDTRAN         1A  B    +1                                     
+      A                                 13  5'INSERT LN RECORDS  '                
+      A            LNINSERT       1A  B    +1                                     
+      A                                    +4'INSERT DD RECORDS  '                
+      A            DDINSERT       1A  B    +1                                     
+      A                                    +4'INSERT CD RECORDS  '                
+      A            CDINSERT       1A  B    +1                                     
+      A                                 15  5'UPDATE LN CHECKS   '                
+      A            LNCHECK        1A  B    +1                                     
+      A                                    +4'UPDATE CD CHECKS   '                
+      A            CDCHECK        1A  B    +1                                     
+      A  41                                  ERRMSG('LIBRARY DOES NOT EXIST' 41)  

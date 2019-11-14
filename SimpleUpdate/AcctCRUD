@@ -1,0 +1,91 @@
+     FGLC500FM  Cf   e             workstn
+     FXACCT     UF A E           K Disk
+      *
+     C*    cnvkey        KLIST
+     C*                  KFLD                    oldbr
+     C*                  KFLD                    oldac
+      *
+      /free
+
+            dow not *IN03;
+              exfmt prompt;
+                If *IN06 = *ON;
+                  mode = ' Add ';
+                  info = '';
+                  exfmt addrec;
+                  if *IN03 = *ON;
+                     *IN03 = *OFF;
+                     exsr init;
+                     iter;
+                  endif;
+                  if newac > 0 and oldac > 0;
+                    exsr wrtrec;
+                  endif;
+                Else;
+                  if oldac > 0;
+                    Chain (oldbr:oldac) rxacct;
+                      If %found(xacct);
+                        mode = 'Update';
+                        exfmt disply ;
+                        if *IN11 = *ON;
+                          exsr dltrec;
+                        else;
+                          exsr updrec;
+                        endif;
+                      Else;
+                        info = 'RECORD NOT FOUND ';
+                      Endif;
+                  endif;
+                Endif;
+              exsr init;
+            enddo;
+            *INLR = *ON;
+
+
+     ********************************
+       //Write Rrecord Routine
+     ********************************
+       begsr wrtrec;
+          write(E) rxacct;
+          if %ERROR;
+            info = 'ERR ADDING RECORD';
+          else;
+            info = '  RECORD ADDED  ';
+          endif;
+         *IN06 = *OFF;
+       endsr;
+
+     *******************************
+       //Update Rrecord Routine
+     *******************************
+       begsr updrec;
+         update rxacct;
+         info = ' RECORD UPDATED ';
+         mode = 'Update';
+       endsr;
+
+     *******************************
+       //Delete Record Routine
+     *******************************
+       begsr dltrec;
+         Delete rxacct;
+         exsr init;
+         info = ' RECORD DELETED ';
+         *IN11 = '0';
+       endsr;
+
+     *******************************
+       //Initialize Routine
+     *******************************
+       begsr init;
+         oldac = 0;
+         oldbr = 0;
+         oldcc = 0;
+         oldpc = 0;
+         newac = 0;
+         newbr = 0;
+         newcc = 0;
+         newpc = 0;
+         mode = '';
+         //*IN33 = *OFF;
+       endsr;                                             

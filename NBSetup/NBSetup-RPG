@@ -1,0 +1,219 @@
+ FNBSETUPFM CF   E             workstn IndDs(ScreenInd)
+
+       //Vars
+       dcl-s frmLib   char(10);
+       dcl-s bankNo   char(3) ;
+       dcl-s lnTran   char(1);
+       dcl-s ddTran   char(1);
+       dcl-s cdTran   char(1);
+       dcl-s lnInsert char(1);
+       dcl-s ddInsert char(1);
+       dcl-s cdInsert char(1);
+       dcl-s lnCheck  char(1);
+       dcl-s cdCheck  char(1);
+       dcl-s retro    char(10);
+
+
+       dcl-c REGZSTMT    const('REGZSTMT');
+       dcl-c ESCROWCHCK  const('ESCROWCHCK');
+       dcl-c LN6890P     const('LN6890P');
+       dcl-c CD1403P     const('CD1403P');
+       dcl-c CD1405P     const('CD1405P');
+
+
+     DScreenInd        ds
+     D  SflHelpF1              1      1n
+     D  Exit                   3      3n
+
+
+     C     *entry        plist
+     C                   parm                    frmlib
+     C                   parm                    bankNo
+     C                   parm                    lnTran
+     C                   parm                    ddTran
+     C                   parm                    cdTran
+     C                   parm                    lnInsert
+     C                   parm                    ddInsert
+     C                   parm                    cdInsert
+     C                   parm                    lnCheck
+     C                   parm                    cdCheck
+     C                   parm                    retro
+
+
+        //Procedures
+        //dcl-pr SetupChecks end-pr;
+        //dcl-pr SetupForms  end-pr;
+        //dcl-pr SetupTrancodes end-pr;
+        //dcl-pr InsertRecords end-pr;
+
+
+
+        Exec SQL set option closqlcsr = *endmod;
+
+
+         SetupForms();
+         SetupChecks();
+         SetupTrancodes();
+         //InsertRecords();
+
+       *inlr = *on;
+
+         ////   Begin Procedures   ////
+
+       dcl-proc SetupForms;
+         //Update Form types in JHREPF to a proper standard build
+
+         dcl-s strSql varchar(100);
+
+         //Exec sql
+         //update jhrepf
+         //set PPL = 198 where Form = 'REGZSTMT';
+
+         strSql = 'Update DAT' + %trim(bankNo) + '/JHREPF' +
+              ' set PPL = 198 where Form = ''' + REGZSTMT + '''';
+
+         Exec SQL Prepare S1 from :strSql;
+         Exec SQL execute S1;
+
+         //Exec sql
+         //update jhrepf
+         //set LPP = 65, OVRFLW = 65, PAGRTT = 0
+         //Where Form = 'ESCROWCHCK';
+
+
+         strSql = 'Update DAT' + %trim(bankNo) + '/JHREPF' +
+              ' set LPP = 65, OVRFLW = 65, PAGRTT = 0' +
+              ' where Form = ''' + ESCROWCHCK + '''';
+
+         Exec SQL Prepare S1 from :strSql;
+         Exec SQL execute S1;
+
+       end-proc;
+
+
+       //Update Checks in JHPARN to a proper standard build
+       dcl-proc SetupChecks;
+           dcl-s strSql varchar(100);
+
+         //Create Escrow Distribution Check (LN6890)
+         If lnCheck = 'Y' or lnCheck = 'y';
+
+
+           strSql = 'Delete from DAT' + %trim(bankNo) + '/JHPARN' +
+              ' where PNNOTC = ''' + LN6890P + '''';
+
+           Exec SQL Prepare S2 from :strSql;
+           Exec SQL execute S2;
+
+           strSql = 'Insert into DAT' + %trim(bankNo) + '/JHPARN' +
+            ' (select * from NBSETUP/JHPARN where PNNOTC = ''' + LN6890P + '''';
+
+           Exec SQL Prepare S2 from :strSql;
+           Exec SQL execute S2;
+         Endif;
+
+         //Create CD Interest Check (CD1403)
+         If cdCheck = 'Y' or cdCheck = 'y';
+
+           strSql = 'Delete from DAT' + %trim(bankNo) + '/JHPARN' +
+              ' where PNNOTC = ''' + CD1403P + '''';
+
+           Exec SQL Prepare S2 from :strSql;
+           Exec SQL execute S2;
+
+           strSql = 'Insert into DAT' + %trim(bankNo) + '/JHPARN' +
+            ' (select * from NBSETUP/JHPARN where PNNOTC = ''' + CD1403P + '''';
+
+           Exec SQL Prepare S2 from :strSql;
+           Exec SQL execute S2;
+
+
+
+           //Create IRA Distribution Check (CD1405)
+
+           strSql = 'Delete from DAT' + %trim(bankNo) + '/JHPARN' +
+              ' where PNNOTC = ''' + CD1405P + '''';
+
+           Exec SQL Prepare S2 from :strSql;
+           Exec SQL execute S2;
+
+           strSql = 'Insert into DAT' + %trim(bankNo) + '/JHPARN' +
+            ' (select * from NBSETUP/JHPARN where PNNOTC = ''' + CD1405P + '''';
+
+           Exec SQL Prepare S2 from :strSql;
+           Exec SQL execute S2;
+
+         Endif;
+
+       end-proc;
+
+
+
+       dcl-proc SetupTrancodes;
+         dcl-s strSql varchar(100);
+         //CD Trancodes
+         If cdTran = 'Y' or cdTran = 'y';
+
+           strsql = 'Delete from DAT' + %trim(bankNo) + '/cdpar3';
+
+           Exec SQL Prepare S3 from :strSql;
+           Exec SQL execute S3;
+
+
+           strSql = 'Insert into DAT' + %trim(bankNo) + '/cdpar3' +
+             '(select * from ' +  %trim(retro) + '/cdpar3std)';
+
+           Exec SQL Prepare S3 from :strSql;
+           Exec SQL execute S3;
+         Endif;
+
+         //DD Trancodes
+         If ddTran = 'Y' or ddTran = 'y';
+
+           strsql = 'Delete from DAT' + %trim(bankNo) + '/ddpar3';
+
+           Exec SQL Prepare S3 from :strSql;
+           Exec SQL execute S3;
+
+           strSql = 'Insert into DAT' + %trim(bankNo) + '/ddpar3' +
+            '(select * from ' +  %trim(retro) + '/ddpar3std)';
+
+           Exec SQL Prepare S3 from :strSql;
+           Exec SQL execute S3;
+         Endif;
+
+         //LN Trancodes
+         If lnTran = 'Y' or lnTran = 'y';
+           strsql = 'Delete from DAT' + %trim(bankNo) + '/lnpar3';
+
+           Exec SQL Prepare S3 from :strSql;
+           Exec SQL execute S3;
+
+           strSql = 'Insert into DAT' + %trim(bankNo) + '/lnpar3' +
+               '(select * from ' + %trim(retro) + '/lnpar3std)';
+
+           Exec SQL Prepare S3 from :strSql;
+           Exec SQL execute S3;
+         Endif;
+
+       end-proc;
+
+       dcl-proc InsertRecords;
+         If cdType = 'Y' or cdType = 'y';
+           strsql = 'Insert into DAT' + %trim(bankNo) + ' /cdpar2' +
+             ' (P2BRNO, P2REGN, PTYPE)' +
+             ' values (0,0,''00'')';
+
+         Exec SQL Prepare S4 from :strSql;
+         Exec SQL execute S4;
+
+
+         Endif;
+       end-proc;
+
+       //TODO: Record Check procedure
+       //  try to read file
+       //  if the read is unsuccessful, file is empty
+       //  -OR-
+       //  do a setll and a read.
+       //  if not %found, file is empty        

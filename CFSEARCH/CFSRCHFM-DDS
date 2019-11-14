@@ -1,0 +1,204 @@
+      A                                      DSPSIZ(24 80 *DS3)                     
+      A                                      REF(*LIBL/PDFREF)                      
+      A                                      PRINT(*LIBL/QSYSPRT)                   
+      A                                      CF03(03 'F3=EXIT')                     
+      A                                      HELP(88 'HELP')                        
+      A          R PROMPT                                                           
+      A                                  8 18'CIF     -OR-  ACCOUNT:'               
+      A*           SEARCH    R        B  8 42REFFLD(CFSNME CFFREF)                  
+      A            SEARCH        11   I  8 42                                       
+      A  41                                  ERRMSG('NO ACCOUNTS FOR SEARCH' 41)    
+      A          R PROMPT2                                                          
+      A                                  2 14'TYPE:  '                              
+      A            SCHAPP         4   B  2 22                                       
+      A  41                                  ERRMSG('TYPE INVALID' 41)              
+      A          R DISPLY                                                           
+      A                                  1  4TIME                                   
+      A                                  1 70DATE                                   
+      A                                      EDTCDE(Y)                              
+      A*           MODE           6   O  2 37DSPATR(HI)                                               
+      A                                 23  2'F3=EXIT'                       
+      A                                  1 31'ACCOUNT/CIF LOOKUP'            
+      A                                      DSPATR(HI)                      
+      A*                                 1 11'ACCOUNT/CIF LOOKUP'            
+      A*                                     DSPATR(HI)                      
+      A*                                 1 51'SEARCHING: '                   
+      A*                                     DSPATR(HI)                      
+      A*                                 1 62 'CDS'                          
+      A                                  4  4'NEW ACCOUNT:'                  
+      A                                      DSPATR(UL)                      
+      A                                  4 19'NEW CIF:'                      
+      A                                      DSPATR(UL)                      
+      A                                  4 30'OLD ACCOUNT:'                  
+      A                                      DSPATR(UL)                      
+      A                                  4 45'OLD CIF:'                      
+      A                                      DSPATR(UL)                      
+      A                                  4 56'PLAN:'                         
+      A                                      DSPATR(UL)                      
+      A            NEWCF          7   O  5 19                                	
+      A            OLDCF          7   O  5 45                         
+      A            NA1           16  0O  5  4EDTCDE(3)                
+      A            NA2           16  0O  6  4EDTCDE(3)                
+      A            NA3           16  0O  7  4EDTCDE(3)                
+      A            NA4           16  0O  8  4EDTCDE(3)                
+      A            NA5           16  0O  9  4EDTCDE(3)                
+      A            NA6           16  0O 10  4EDTCDE(3)                
+      A            OA1           16  0O  5 30EDTCDE(3)                
+      A            OA2           16  0O  6 30EDTCDE(3)                
+      A            OA3           16  0O  7 30EDTCDE(3)                
+      A            OA4           16  0O  8 30EDTCDE(3)                
+      A            OA5           16  0O  9 30EDTCDE(3)                
+      A            OA6           16  0O 10 30EDTCDE(3)                
+      A            PL1            3   O  5 56                         
+      A            PL2            3   O  6 56                         
+      A            PL3            3   O  7 56                         
+      A            PL4            3   O  8 56                         
+      A            PL5            3   O  9 56                         
+      A            PL6            3   O 10 56  
+      A          R DISPLY2                                                  
+      A                                  1  4TIME                           
+      A                                  1 70DATE                           
+      A                                      EDTCDE(Y)                      
+      A*           MODE           6   O  2 37DSPATR(HI)                     
+      A                                 23  2'F3=EXIT'                      
+      A*                                 1 31'ACCOUNT/CIF LOOKUP'           
+      A*                                     DSPATR(HI)                     
+      A                                  1 21'ACCOUNT/CIF LOOKUP'           
+      A                                      DSPATR(HI)                     
+      A                                  1 45'SEARCHING: '                  
+      A                                      DSPATR(HI)                     
+      A            SCHAPP         4   O  1 57                               
+      A                                  4  1'STS:'                         
+      A                                      DSPATR(UL)                     
+      A                                  4  6'NEW ACCT:       '             
+      A                                      DSPATR(UL)                     
+      A                                  4 24'OLD ACCT:       '             
+      A                                      DSPATR(UL)             
+      A                                  4 42'TYPE:'                          
+      A                                      DSPATR(UL)                       
+      A                                  4 49'MAT DATE:'                      
+      A                                      DSPATR(UL)                       
+      A                                 12 45'OLD CIF:'                       
+      A                                      DSPATR(UL)                       
+      A                                 12 19'NEW CIF:'                       
+      A                                      DSPATR(UL)                       
+      A            NEWCF          7   O 13 19                                 
+      A            OLDCF          7   O 13 45                                 
+      A            ST1            1  0O  5  2EDTCDE(3)                        
+      A            ST2            1  0O  6  2EDTCDE(3)                        
+      A            ST3            1  0O  7  2EDTCDE(3)                        
+      A            ST4            1  0O  8  2EDTCDE(3)                        
+      A            ST5            1  0O  9  2EDTCDE(3)                        
+      A            ST6            1  0O 10  2EDTCDE(3)                        
+      A            NA1           16  0O  5  6EDTCDE(3)                        
+      A            NA2           16  0O  6  6EDTCDE(3)                        
+      A            NA3           16  0O  7  6EDTCDE(3)  
+      A            NA4           16  0O  8  6EDTCDE(3)                 
+      A            NA5           16  0O  9  6EDTCDE(3)                 
+      A            NA6           16  0O 10  6EDTCDE(3)                 
+      A            OA1           16  0O  5 24EDTCDE(3)                 
+      A            OA2           16  0O  6 24EDTCDE(3)                 
+      A            OA3           16  0O  7 24EDTCDE(3)                 
+      A            OA4           16  0O  8 24EDTCDE(3)                 
+      A            OA5           16  0O  9 24EDTCDE(3)                 
+      A            OA6           16  0O 10 24EDTCDE(3)                 
+      A            TY1            3   O  5 43                          
+      A            TY2            3   O  6 43                          
+      A            TY3            3   O  7 43                          
+      A            TY4            3   O  8 43                          
+      A            TY5            3   O  9 43                          
+      A            TY6            3   O 10 43                          
+      A            MD1            7  0O  5 49                          
+      A            MD2            7  0O  6 49                          
+      A            MD3            7  0O  7 49                          
+      A            MD4            7  0O  8 49  
+      A            MD5            7  0O  9 49                                  
+      A            MD6            7  0O 10 49                                  
+      A          R DISPLYALL                                                   
+      A                                  1  4TIME                              
+      A                                  1 70DATE                              
+      A                                      EDTCDE(Y)                         
+      A*           MODE           6   O  2 37DSPATR(HI)                        
+      A                                 23  2'F3=EXIT'                         
+      A*                                 1 31'ACCOUNT/CIF LOOKUP'              
+      A*                                     DSPATR(HI)                        
+      A                                  1 21'ACCOUNT/CIF LOOKUP'              
+      A                                      DSPATR(HI)                        
+      A                                  1 45'SEARCHING: '                     
+      A                                      DSPATR(HI)                        
+      A            SCHAPP         4   O  1 57                                  
+      A                                  4  1'STS:'                            
+      A                                      DSPATR(UL)                        
+      A                                  4  6'NEW ACCT:       '                
+      A                                      DSPATR(UL)       
+      A                                  4 24'OLD ACCT:       '        
+      A                                      DSPATR(UL)                
+      A                                  4 42'TYPE:'                   
+      A                                      DSPATR(UL)                
+      A                                  4 49'MAT DATE:'               
+      A                                      DSPATR(UL)                
+      A                                  4 60'NEW CIF:'                
+      A                                      DSPATR(UL)                
+      A                                  4 70'OLD CIF:'                
+      A                                      DSPATR(UL)                
+      A            NEWCF          7   O  5 60                          
+      A            OLDCF          7   O  5 70                          
+      A                                  5  4'LOAN'                    
+      A            LNST1          1  0O  6  2EDTCDE(3)                 
+      A            LNST2          1  0O  7  2EDTCDE(3)                 
+      A            LNST3          1  0O  8  2EDTCDE(3)                 
+      A            LNST4          1  0O  9  2EDTCDE(3)                 
+      A                                 10  4'CD/IRA'                  
+      A            CDST1          1  0O 11  2EDTCDE(3)  
+      A            CDST2          1  0O 12  2EDTCDE(3)            
+      A            CDST3          1  0O 13  2EDTCDE(3)            
+      A            CDST4          1  0O 14  2EDTCDE(3)            
+      A                                 15  4'DDA/SAV'            
+      A            DDST1          1  0O 16  2EDTCDE(3)            
+      A            DDST2          1  0O 17  2EDTCDE(3)            
+      A            DDST3          1  0O 18  2EDTCDE(3)            
+      A            DDST4          1  0O 19  2EDTCDE(3)            
+      A            LNNA1         16  0O  6  6EDTCDE(3)            
+      A            LNNA2         16  0O  7  6EDTCDE(3)            
+      A            LNNA3         16  0O  8  6EDTCDE(3)            
+      A            LNNA4         16  0O  9  6EDTCDE(3)            
+      A            CDNA1         16  0O 11  6EDTCDE(3)            
+      A            CDNA2         16  0O 12  6EDTCDE(3)            
+      A            CDNA3         16  0O 13  6EDTCDE(3)            
+      A            CDNA4         16  0O 14  6EDTCDE(3)            
+      A            DDNA1         16  0O 16  6EDTCDE(3)            
+      A            DDNA2         16  0O 17  6EDTCDE(3)            
+      A            DDNA3         16  0O 18  6EDTCDE(3)      
+      A            DDNA4         16  0O 19  6EDTCDE(3)               
+      A            LNOA1         16  0O  6 24EDTCDE(3)               
+      A            LNOA2         16  0O  7 24EDTCDE(3)               
+      A            LNOA3         16  0O  8 24EDTCDE(3)               
+      A            LNOA4         16  0O  9 24EDTCDE(3)               
+      A            CDOA1         16  0O 11 24EDTCDE(3)               
+      A            CDOA2         16  0O 12 24EDTCDE(3)               
+      A            CDOA3         16  0O 13 24EDTCDE(3)               
+      A            CDOA4         16  0O 14 24EDTCDE(3)               
+      A            DDOA1         16  0O 16 24EDTCDE(3)               
+      A            DDOA2         16  0O 17 24EDTCDE(3)               
+      A            DDOA3         16  0O 18 24EDTCDE(3)               
+      A            DDOA4         16  0O 19 24EDTCDE(3)               
+      A            LNTY1          3   O  6 43                        
+      A            LNTY2          3   O  7 43                        
+      A            LNTY3          3   O  8 43                        
+      A            LNTY4          3   O  9 43                        
+      A            CDTY1          3   O 11 43                        
+      A            CDTY2          3   O 12 43  
+      A            CDTY3          3   O 13 43                 
+      A            CDTY4          3   O 14 43                 
+      A            DDTY1          3   O 16 43                 
+      A            DDTY2          3   O 17 43                 
+      A            DDTY3          3   O 18 43                 
+      A            DDTY4          3   O 19 43                 
+      A            LNMD1          7  0O  6 49                 
+      A            LNMD2          7  0O  7 49                 
+      A            LNMD3          7  0O  8 49                 
+      A            LNMD4          7  0O  9 49                 
+      A            CDMD1          7  0O 11 49                 
+      A            CDMD2          7  0O 12 49                 
+      A            CDMD3          7  0O 13 49                 
+      A            CDMD4          7  0O 14 49                 	  

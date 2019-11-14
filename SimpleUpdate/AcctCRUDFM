@@ -1,0 +1,83 @@
+      A                                      DSPSIZ(24 80 *DS3)                      
+      A                                      REF(*LIBL/PDFREF)                       
+      A                                      PRINT(*LIBL/QSYSPRT)                    
+      A                                      CF03(03 'F3=EXIT')                      
+      A                                      HELP(88 'HELP')                         
+      A          R PROMPT                                                            
+      A                                      CF06(06 'F6=ADD')                       
+      A                                  1  4TIME                                    
+      A                                  1 70DATE                                    
+      A                                      EDTCDE(Y)                               
+      A                                 23  2'F3=EXIT'                               
+      A                                 23 12'F6=ADD'                                
+      A                                  1 17'ACCOUNT NUMBER TRANSLATION PARAMET-    
+      A                                      ER MAINTENANCE'                         
+      A                                      DSPATR(HI)                              
+      A                                  4  4'BRANCH NO:'                            
+      A            OLDBR          3  0B  4 25                                        
+      A                                  5  4'ACCOUNT NUMBER:'                       
+      A            OLDAC          7  0B  5 21         
+      A                                  6  4'COST CENTER:'                        
+      A            OLDCC          4  0B  6 24                                      
+      A                                  7  4'PRODUCT CODE:'                       
+      A            OLDPC          3  0B  7 25                                      
+      A            INFO          17   O  9 33DSPATR(HI)                            
+      A* 33                              9 30'RECORD NOT FOUND'                    
+      A*                                     DSPATR(HI)                            
+      A*                                                                           
+      A          R DISPLY                                                          
+      A N33                                  CF11(11 'F11=DELETE')                 
+      A                                  1  4TIME                                  
+      A                                  1 70DATE                                  
+      A                                      EDTCDE(Y)                             
+      A            MODE           6   O  2 37DSPATR(HI)                            
+      A                                 23  2'F3=EXIT'                             
+      A                                 23 11'F11=DELETE'                          
+      A                                  1 17'ACCOUNT NUMBER TRANSLATION PARAMET-  
+      A                                      ER MAINTENANCE'                       
+      A                                      DSPATR(HI)                            
+      A                                  4  4'BRANCH NO:'                      
+      A            OLDBR          3  0O  4 25EDTCDE(3)                         
+      A                                  5  4'ACCOUNT NUMBER:'                 
+      A            OLDAC          7  0O  5 21EDTCDE(3)                         
+      A                                  6  4'COST CENTER:'                    
+      A            OLDCC          4  0O  6 24EDTCDE(3)                         
+      A                                  7  4'PRODUCT CODE:'                   
+      A            OLDPC          3  0O  7 25EDTCDE(3)                         
+      A                                  4 37'TRANSLATE TO BRANCH :'           
+      A            NEWBR          3  0B  4 64EDTCDE(3)                         
+      A                                  5 37'TRANSLATE TO ACCOUNT:'           
+      A            NEWAC          7  0B  5 60EDTCDE(3)                         
+      A                                  6 37'COST CENTER:'                    
+      A            NEWCC          4  0B  6 63EDTCDE(3)                         
+      A                                  7 37'PRODUCT CODE:'                   
+      A            NEWPC          3  0B  7 64EDTCDE(3)                         
+      A*                                 7 37'TRANSLATE TO CENTER :'           
+      A*           INEWCC         4  0B  7 60                                  
+      A          R ADDREC                          
+      A                                  1  4TIME                                
+      A                                  1 70DATE                                
+      A                                      EDTCDE(Y)                           
+      A            MODE           6   O  2 37DSPATR(HI)                          
+      A                                 23  2'F3=EXIT'                           
+      A                                  1 17'ACCOUNT NUMBER TRANSLATION PARAMET-
+      A                                      ER MAINTENANCE'                     
+      A                                      DSPATR(HI)                          
+      A                                  4  4'BRANCH NO:'                        
+      A            OLDBR          3  0B  4 25EDTCDE(Z)                           
+      A                                  5  4'ACCOUNT NUMBER:'                   
+      A            OLDAC          7  0B  5 21EDTCDE(Z)                           
+      A                                  6  4'COST CENTER:'                      
+      A            OLDCC          4  0B  6 24EDTCDE(3)                           
+      A                                  7  4'PRODUCT CODE:'                     
+      A            OLDPC          3  0B  7 25EDTCDE(3)                           
+      A                                  4 37'TRANSLATE TO BRANCH :'             
+      A            NEWBR          3  0B  4 64EDTCDE(Z)                           
+      A                                  5 37'TRANSLATE TO ACCOUNT:'       
+      A            NEWAC          7  0B  5 60EDTCDE(Z)                    
+      A                                  6 37'COST CENTER:'               
+      A            NEWCC          4  0B  6 63EDTCDE(3)                    
+      A                                  7 37'PRODUCT CODE:'              
+      A            NEWPC          3  0B  7 64EDTCDE(3)                    
+      A*                                 7 37'TRANSLATE TO CENTER :'      
+      A*           INEWCC         4  0B  7 60                             

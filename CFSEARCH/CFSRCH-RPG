@@ -1,0 +1,778 @@
+     FCFSRCHFM  Cf   e             workstn
+     Fecdmast   if   e           k disk    prefix(ec_) rename(rcdmast:recdmast)
+     Fcdmast    if   e           k disk    prefix(c_)
+     Felnmast   if   e           k disk    prefix(el_) rename(rlnmast:relnmast)
+     Flnmast    if   e           k disk    prefix(l_)
+     Feddmast   if   e           k disk    prefix(ed_) rename(rddmast:reddmast)
+     Fddmast    if   e           k disk    prefix(d_)
+     Foldnew    if   e           k disk
+     Fcfoldnew  if   e           k disk
+
+       //***********************************************************************
+       // Standalone Fields
+       //***********************************************************************
+       dcl-s   i         int(3)    inz(0);
+       dcl-s   n         int(3)    inz(0);
+       dcl-s   p         int(3)    inz(0);
+       dcl-s   pos       int(3)    inz(0);
+       dcl-s   fCheck    int(3)    inz(0);
+       dcl-s   fileName  char(10);
+       dcl-s   newcf     char(7);
+       dcl-s   oldcf     char(7);
+       dcl-s   srchTyp   char(4)    inz('ACCT');
+       dcl-s   sapp      char(4)    inz('*ALL');
+       dcl-s   sa        char(1)    dim(11);
+       dcl-s   an        packed(1)  dim(16);
+       dcl-s   srchAct   packed(11) inz(0);
+       dcl-s   srchCif   char(11);
+       dcl-s   AType     char(2);
+
+       dcl-c   ACTTST    const('0123456789 ');
+       dcl-c   MAXLENGTH const(11);
+       dcl-c   SUCCESS   const(0);
+       dcl-c   NTFND     const(3);
+       dcl-c   QUOTE     const('''');
+
+       dcl-pr  GetAct ;
+         cif      char(20)  value;
+         fName    char(10)  value;
+       end-pr;
+
+       dcl-pr  GetAllActs;
+         cif      char(10) value;
+       end-pr;
+
+       dcl-pr GetOldAct int(20);
+         dcl-parm  newAcc   int(20) value;
+         dcl-parm  accTyp   char(1) value;
+       end-pr;
+
+       dcl-pr  GetCif;
+         acct     int(20)     value;
+         fName    char(10)    value;
+       end-pr;
+
+       dcl-pr  GetOldCif;
+         acct     packed(20)  value;
+         fName    char(10)    value;
+       end-pr;
+
+       dcl-pr  GetNewCif;
+         acct     packed(20)  value;
+         fName    char(10)    value;
+       end-pr;
+
+       dcl-pr GetCFOldnew ;
+         cif      char(20) value;
+       end-pr;
+
+       dcl-pr Initialize;
+       end-pr;
+
+     D lnsttus         ds                  inz
+     D lnst1
+     D lnst2
+     D lnst3
+     D lnst4
+     D lnst                           1  0 Dim(4) Overlay(lnsttus:1)
+
+     D cdsttus         ds                  inz
+     D cdst1
+     D cdst2
+     D cdst3
+     D cdst4
+     D cdst                           1  0 Dim(4) Overlay(cdsttus:1)
+
+     D ddsttus         ds                  inz
+     D ddst1
+     D ddst2
+     D ddst3
+     D ddst4
+     D ddst                           1  0 Dim(4) Overlay(ddsttus:1)
+
+     D sttus           ds                  inz
+     D st1
+     D st2
+     D st3
+     D st4
+     D st5
+     D st6
+     D st                             1  0 Dim(6) Overlay(sttus:1)
+
+     D lnnewac         ds                  inz
+     D lnna1
+     D lnna2
+     D lnna3
+     D lnna4
+     D lnna                          16  0 Dim(4) Overlay(lnnewac:1)
+
+     D cdnewac         ds                  inz
+     D cdna1
+     D cdna2
+     D cdna3
+     D cdna4
+     D cdna                          16  0 Dim(4) Overlay(cdnewac:1)
+
+     D ddnewac         ds                  inz
+     D ddna1
+     D ddna2
+     D ddna3
+     D ddna4
+     D ddna                          16  0 Dim(4) Overlay(ddnewac:1)
+
+     D newac           ds                  inz
+     D na1
+     D na2
+     D na3
+     D na4
+     D na5
+     D na6
+     D na                            16  0 Dim(6) Overlay(newac:1)
+
+     D lnoldac         ds                  inz
+     D lnoa1
+     D lnoa2
+     D lnoa3
+     D lnoa4
+     D lnoa                          16  0 Dim(4) Overlay(lnoldac:1)
+
+     D cdoldac         ds                  inz
+     D cdoa1
+     D cdoa2
+     D cdoa3
+     D cdoa4
+     D cdoa                          16  0 Dim(4) Overlay(cdoldac:1)
+
+     D ddoldac         ds                  inz
+     D ddoa1
+     D ddoa2
+     D ddoa3
+     D ddoa4
+     D ddoa                          16  0 Dim(4) Overlay(ddoldac:1)
+
+     D oldac           ds                  inz
+     D oa1
+     D oa2
+     D oa3
+     D oa4
+     D oa5
+     D oa6
+     D oa                            16  0 Dim(6) Overlay(oldac:1)
+
+     D lnType          ds                  inz
+     D lnty1
+     D lnty2
+     D lnty3
+     D lnty4
+     D lnty                           3    Dim(4) Overlay(lnType:1)
+
+     D cdType          ds                  inz
+     D cdty1
+     D cdty2
+     D cdty3
+     D cdty4
+     D cdty                           3    Dim(4) Overlay(cdType:1)
+
+     D ddType          ds                  inz
+     D ddty1
+     D ddty2
+     D ddty3
+     D ddty4
+     D ddty                           3    Dim(4) Overlay(ddType:1)
+
+     D Type            ds                  inz
+     D ty1
+     D ty2
+     D ty3
+     D ty4
+     D ty5
+     D ty6
+     D ty                             3    Dim(6) Overlay(Type:1)
+
+     D lnMatDt         ds                  inz
+     D lnmd1
+     D lnmd2
+     D lnmd3
+     D lnmd4
+     D lnmd                           7  0 Dim(4) Overlay(lnMatDt:1)
+
+     D cdMatDt         ds                  inz
+     D cdmd1
+     D cdmd2
+     D cdmd3
+     D cdmd4
+     D cdmd                           7  0 Dim(4) Overlay(cdMatDt:1)
+
+     D sqlMatDt        ds                  inz
+     D md1
+     D md2
+     D md3
+     D md4
+     D md5
+     D md6
+     D md                             7  0 Dim(6) Overlay(sqlMatDt:1)
+
+     D sqlpl           ds                  inz
+     D pl1
+     D pl2
+     D pl3
+     D pl4
+     D pl5
+     D pl6
+     D pl                             3    Dim(6) Overlay(sqlpl:1)
+
+
+        Exec SQL set option closqlcsr = *endmod;
+
+        dow not *IN03;
+          Initialize();
+          exfmt prompt;
+
+          if *IN03;
+            leave;
+          endif;
+
+          if search = *blanks;
+            leave;
+          endif;
+
+          //load array w/ search argument
+          for i = 1 to %elem(sa);
+            sa(i) = %subst(search:i:1);
+          endfor;
+
+          //get length of search argument
+          p = MAXLENGTH;
+          dow sa(p) = ' ';
+            p -= 1;
+          enddo;
+
+          dow p > 0;
+            pos = %check(ACTTST:sa(p));
+            if pos > 0;
+              //found a char other than a num
+              srchTyp = 'CIF#';
+              p = 0;
+            endif;
+            p -= 1;
+          enddo;
+
+          //set schapp = '*ALL'
+          schapp = sapp;
+          exfmt prompt2;
+
+          if *IN03;
+            leave;
+          endif;
+
+          sapp = %trim(schapp);
+          select;
+            when sapp = '*ALL' or sapp = '*all' or sapp = 'all ' or
+                 sapp = 'ALL ';
+              fileName = '*ALL';
+              AType = 'A';
+            when sapp = 'CD' or sapp = 'cd';
+              fileName = 'cdmast';
+              AType = 'T';
+            when sapp = 'DD' or sapp = 'dd';
+              fileName = 'ddmast';
+              AType = 'D';
+            when sapp = 'LN' or sapp = 'ln';
+              fileName = 'lnmast';
+              AType = 'L';
+            other;
+              *in41 = *on;
+              exfmt prompt;
+          endsl;
+
+          If srchTyp = 'ACCT';
+            srchAct = %int(%trim(search));
+            GetNewCif(srchAct:fileName);
+            GetOldCif(srchAct:fileName);
+            GetAct(newCf:fileName);
+
+          Elseif srchTyp = 'CIF#';
+            srchCif = %trim(search);
+            GetCFOldnew(srchCif);
+            GetAct(newCf:fileName);
+            if oldcf = *blanks;
+              GetOldCif(srchAct:fileName);
+            endif;
+          Endif;
+
+          if AType = 'A';
+            exfmt displyAll;
+          else;
+            exfmt disply2;
+          endif;
+
+        enddo;
+       *inlr = *on;
+
+     *******************************
+       //Find CIF Routine
+     *******************************
+       dcl-proc GetOldCif;
+         dcl-pi *N;
+           dcl-parm  acct     packed(20) value;
+           dcl-parm  fName    char(10)   value;
+         end-pi;
+
+         select;
+         when fName = 'cdmast';
+           chain (acct) recdmast;
+           if %found(ecdmast);
+             oldcf = ec_cifno;
+             srchCif = ec_cifno;
+           else;
+             //not found
+           endif;
+         when fName = 'lnmast';
+           chain (acct) relnmast;
+           if %found(elnmast);
+             oldcf = el_cifno;
+             srchCif = el_cifno;
+           else;
+             //not found
+           endif;
+         when fName = 'ddmast';
+           chain (acct) reddmast;
+           if %found(eddmast);
+             oldcf = ed_cifno;
+             srchCif = ed_cifno;
+           else;
+             //not found
+           endif;
+         when fName = '*ALL';
+           chain (acct) recdmast;
+           If %found(ecdmast);
+             oldcf = ec_cifno;
+             srchCif = ec_cifno;
+           Else;
+             chain (acct) relnmast;
+             if %found(elnmast);
+               oldcf = el_cifno;
+               srchCif = el_cifno;
+             else;
+               chain (acct) reddmast;
+               if %found(eddmast);
+                 oldcf = ed_cifno;
+                 srchCif = ed_cifno;
+               else;
+                 //not found
+               endif;
+             endif;
+           Endif;
+         endsl;
+
+
+       end-proc;
+
+     *******************************
+       //Find CIF Routine
+     *******************************
+       dcl-proc GetNewCif;
+         dcl-pi *N;
+           dcl-parm  acct     packed(20) value;
+           dcl-parm  fName    char(10)   value;
+         end-pi;
+
+         Select;
+         When fName = 'cdmast';
+           chain (acct) rcdmast;
+           if %found(cdmast);
+             newcf = c_cifno;
+             srchCif = c_cifno;
+           else;
+             //not found
+           endif;
+         When fName = 'lnmast';
+           chain (acct) rlnmast;
+           if %found(lnmast);
+             newcf = l_cifno;
+             srchCif = l_cifno;
+           else;
+             //not found
+           endif;
+         When fName = 'ddmast';
+           chain (acct) rddmast;
+           if %found(ddmast);
+             newcf = d_cifno;
+             srchCif = d_cifno;
+           else;
+             //not found
+           endif;
+         When fName = '*ALL';
+           chain (acct) rcdmast;
+           If %found(cdmast);
+             newcf = c_cifno;
+             srchCif = c_cifno;
+           Else;
+             chain (acct) rlnmast;
+             if %found(lnmast);
+               newcf = l_cifno;
+               srchCif = l_cifno;
+             else;
+               chain (acct) rddmast;
+               if %found(ddmast);
+                 newcf = d_cifno;
+                 srchCif = d_cifno;
+               else;
+                 //not found
+               endif;
+             endif;
+           Endif;
+         Endsl;
+
+
+       end-proc;
+
+     *******************************
+       //Find CIF Routine
+     *******************************
+       dcl-proc GetCif;
+         dcl-pi *N;
+           dcl-parm  acct     int(20) value;
+           dcl-parm  fName    char(10) value;
+         end-pi;
+
+         select;
+         when fName = 'cdmast';
+           chain (acct) rcdmast;
+           If %found(cdmast);
+             newcf = c_cifno;
+             srchCif = c_cifno;
+           Else;
+             chain (acct) recdmast;
+             if %found(ecdmast);
+               oldcf = ec_cifno;
+               srchCif = ec_cifno;
+             else;
+               //not found
+             endif;
+           Endif;
+         when fName = 'lnmast';
+           //chain lnmast;
+           chain (acct) rlnmast;
+           If %found(lnmast);
+             newcf = l_cifno;
+             srchCif = l_cifno;
+           Else;
+             chain (acct) relnmast;
+             if %found(elnmast);
+               oldcf = el_cifno;
+               srchCif = el_cifno;
+             else;
+               //not found
+             endif;
+           Endif;
+         when fName = 'ddmast';
+           //chain ddmast;
+           chain (acct) rddmast;
+           If %found(ddmast);
+             newcf = d_cifno;
+             srchCif = d_cifno;
+           Else;
+             chain (acct) reddmast;
+             if %found(eddmast);
+               oldcf = ed_cifno;
+               srchCif = ed_cifno;
+             else;
+               //not found
+             endif;
+           Endif;
+         when fName = '*ALL';
+           //chain all;
+         endsl;
+
+
+       end-proc;
+
+     *********************************
+       //Find Acct Routine
+     *********************************
+       dcl-proc GetAct;
+
+         dcl-s x          int(3);
+         dcl-s strSql     varchar(100);
+         dcl-s strSel     varchar(30);
+         dcl-s sqlCStatus char(1);
+         dcl-s sqlStatus  packed(1) ;
+         dcl-s sqlAcctno  packed(16);
+         dcl-s sqlType    char(2)   ;
+         dcl-s sqlMat     packed(7) ;
+
+         dcl-pi *N;
+           dcl-parm  cif      char(20) value;
+           dcl-parm  fName    char(10) value;
+         end-pi;
+
+         select;
+           when fName = '*ALL';
+             fileName = 'lnmast';
+             GetAllActs(newCf);
+             return;
+           when AType = 'D';
+             strSel = 'status,acctno,actype';
+           other;
+             strSel = 'status,acctno,type,matdt6';
+         endsl;
+
+
+         strSql = 'Select ' + %trim(strSel) + ' From ' + %trim(fName) +
+                  ' Where cifno = ''' +  %trim(cif) + '''' +
+                  ' Order By acctno';
+      // strSql = 'Select acctno,status from ecdmast where cifno = ?';
+      //Exec SQL Open C1 Using :varCif;
+
+         x = 1;
+         Exec SQL Prepare S1 from :strSql;
+         Exec SQL Declare C1 Cursor FOR S1;
+         Exec SQL OPEN C1;
+         //Exec SQL Declare C1 Cursor FOR
+         //  select :strSel from ecdmast
+         //  where cifno = :varCif;
+         //endif;
+
+         if %subst(fName:1:1) = 'e';
+           Exec SQL Fetch C1 into :sqlCStatus, :sqlAcctno,
+               :sqlType;
+         else;
+           Exec SQL Fetch C1 into :sqlStatus,
+               :sqlAcctno,:sqlType,:sqlMat;
+         endif;
+
+         Dow SQLSTATE = '00000'or SQLSTATE = '01503' or SQLSTATE = '01557';
+            //01557 = Too many vars specified in Fetch
+            //01503 = # of Results larger than # of vars
+             if %subst(fName:1:1) = 'e';
+               oldcf = %trim(cif);
+               oa(x) = sqlAcctno;
+             else;
+               //populating screen variables
+               newcf = %trim(cif);
+               na(x) = sqlAcctno;
+               st(x) = sqlStatus;
+               ty(x) = sqlType;
+               md(x) = sqlMat;
+               if AType = 'D';
+                 oa(x) = GetOldAct(na(x):sqlType);
+               else;
+                 oa(x) = GetOldAct(na(x):AType);
+               endif;
+               srchAct = na(1);
+             endif;
+
+             if %subst(fName:1:1) = 'e';
+               Exec SQL Fetch C1 into :sqlCStatus, :sqlAcctno,
+                 :sqlType;
+             else;
+               Exec SQL Fetch C1 into :sqlStatus,
+                 :sqlAcctno,:sqlType,:sqlMat;
+             endif;
+
+           if x < %Elem(na);
+             x += 1;
+           else;
+             leave;
+           endif;
+         Enddo;
+
+
+         If SQLSTATE = '02000' and x > 1;
+             Exec SQL Close C1;
+         Endif;
+
+         If SQLSTATE = '02000' and x = 1;
+           //First Pass didn't return a hit, look in servicer
+           Exec SQL Close C1;
+           fileName = 'e' + fileName;
+           GetAct(cif:fileName);
+         Endif;
+
+      // EXEC SQL EXECUTE IMMEDIATE :strSql
+
+       end-proc;
+
+     *********************************
+       //Get Old Acct Routine
+     *********************************
+       dcl-proc GetOldAct;
+         dcl-s  sqlAct    int(20);
+         dcl-s  strSql    char(100);
+
+         dcl-pi *N   int(20);
+           dcl-parm  newAcc   int(20) value;
+           dcl-parm  accTyp   char(1) value;
+         end-pi;
+
+         strSql = 'Select olacc# From oldnew' +
+                   ' Where nwacc# = ' +  %editc(newAcc:'X') +
+                   ' and nwtype = ''' + accTyp + '''';
+
+         Exec SQL Prepare S2 from :strSql;
+         Exec SQL Declare C2 Cursor FOR S2;
+         Exec SQL OPEN C2;
+         Exec SQL Fetch C2 into :sqlAct;
+
+         if SQLSTATE = '00000';
+           Exec SQL Close C2;
+           return sqlAct;
+         else;
+           Exec SQL Close C2;
+           return 0;
+         endif;
+       end-proc;
+     *********************************
+       //Get CIF CFOldnew Routine
+     *********************************
+       dcl-proc  GetCFOldnew;
+
+         dcl-pi *N ;
+           dcl-parm  cif      char(20) value;
+         end-pi;
+
+         chain (cif) rcfoldnew;
+         If %found(cfoldnew);
+           newcf = newcif;
+           oldcf = oldcif;
+         Else;
+           //we either have a new CIF or a nonexistant cif
+           newcf = cif;
+         Endif;
+
+       end-proc;
+     *******************************
+       //Find All Routine
+     *********************************
+       dcl-proc GetAllActs;
+
+         dcl-s x          int(3);
+         dcl-s strSql     varchar(100);
+         dcl-s fName      char(7);
+         dcl-s strSel     varchar(30);
+         dcl-s sqlCStatus char(1);
+         dcl-s sqlStatus  packed(1) ;
+         dcl-s sqlAcctno  packed(16);
+         dcl-s sqlType    char(2)   ;
+         dcl-s sqlMat     packed(7) ;
+
+         dcl-pi *N;
+           dcl-parm  cif      char(10) value;
+         end-pi;
+
+         select;
+           when fileName = 'lnmast';
+             strSel = 'status,acctno,type,matdt6';
+             Atype = 'L';
+           when fileName = 'cdmast';
+             strSel = 'status,acctno,type,matdt6';
+             Atype = 'T';
+           when fileName = 'ddmast';
+             strSel = 'status,acctno,actype';
+             AType = 'D';
+         endsl;
+
+         strSql = 'Select ' + %trim(strSel) + ' From ' + %trim(fileName) +
+                  ' Where cifno = ''' +  %trim(cif) + '''' +
+                  ' Order By acctno';
+
+         x = 1;
+         Exec SQL Prepare SA from :strSql;
+         Exec SQL Declare CA Cursor FOR SA;
+         Exec SQL OPEN CA;
+
+         Exec SQL Fetch CA into :sqlStatus,
+             :sqlAcctno,:sqlType,:sqlMat;
+
+         Dow SQLSTATE = '00000'or SQLSTATE = '01503' or SQLSTATE = '01557';
+            //01557 = Too many vars specified in Fetch
+            //01503 = # of Results larger than # of vars
+               select;
+                 when fileName = 'lnmast';
+                   lnna(x) = sqlAcctno;
+                   lnst(x) = sqlStatus;
+                   lnty(x) = sqlType;
+                   lnmd(x) = sqlMat;
+                   lnoa(x) = GetOldAct(lnna(x):AType);
+                   srchAct = lnna(1);
+                 when fileName = 'cdmast';
+                   cdna(x) = sqlAcctno;
+                   cdst(x) = sqlStatus;
+                   cdty(x) = sqlType;
+                   cdmd(x) = sqlMat;
+                   cdoa(x) = GetOldAct(cdna(x):AType);
+                   srchAct = cdna(1);
+                 when fileName = 'ddmast';
+                   ddna(x) = sqlAcctno;
+                   ddst(x) = sqlStatus;
+                   ddty(x) = sqlType;
+                   ddoa(x) = GetOldAct(ddna(x):sqlType);
+                   srchAct = ddna(1);
+               endsl;
+
+               Exec SQL Fetch CA into :sqlStatus,
+                 :sqlAcctno,:sqlType,:sqlMat;
+
+           if x < %Elem(lnna);
+             x += 1;
+           else;
+             leave;
+           endif;
+         Enddo;
+
+         select;
+           when fileName = 'lnmast';
+             fileName = 'cdmast';
+           when fileName = 'cdmast';
+             fileName = 'ddmast';
+           when fileName = 'ddmast';
+             Exec SQL Close CA;
+             AType = 'A';
+             return;
+         endsl;
+
+         Exec SQL Close CA;
+         GetAllActs(cif);
+
+       end-proc;
+     *********************************
+       //Reset Fields to Blanks/Zeros
+     *********************************
+       dcl-proc Initialize;
+
+          for i = 1 to %elem(sa);
+            sa(i) = *blank;
+          endfor;
+
+          for i = 1 to %elem(na);
+            na(i) = *zeros;
+            st(i) = *zeros;
+            ty(i) = *blanks;
+            md(i) = *zeros;
+            oa(i) = *zeros;
+          endfor;
+
+          for i = 1 to %elem(lnna);
+            lnna(i) = *zeros;
+            lnst(i) = *zeros;
+            lnty(i) = *blanks;
+            lnmd(i) = *zeros;
+            lnoa(i) = *zeros;
+            cdna(i) = *zeros;
+            cdst(i) = *zeros;
+            cdty(i) = *blanks;
+            cdmd(i) = *zeros;
+            cdoa(i) = *zeros;
+            ddna(i) = *zeros;
+            ddst(i) = *zeros;
+            ddty(i) = *blanks;
+            ddoa(i) = *zeros;
+          endfor;
+
+          newcf = *blanks;
+          oldcf = *blanks;
+          search = *blanks;
+          srchTyp = 'ACCT';
+
+       end-proc; 
